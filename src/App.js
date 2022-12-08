@@ -1,45 +1,39 @@
-import React, { Component } from "react";
+import React, { Component, useEffect, useState } from "react";
 import CardList from "./components/card-list/CardList";
 import SearchBox from "./components/search-list/SearchBox";
-import './App.css'
-class App extends Component {
-  constructor() {
-    super();
+import "./App.css";
 
-    this.state = {
-      monsters: [],
-      searchField: "",
-    };
-  }
+export const App = () => {
+  const [searchField, setSearchFeild] = useState("");
+  const [monsters , setMonster] = useState([])
 
-  //Fetching monsters name. We are going to fetch the names after react page render
-  componentDidMount() {
+  useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/users")
       .then((response) => response.json())
-      .then((users) => {
-        this.setState({ monsters: users });
-      });
-  }
+      .then((res) => setMonster(res));
+  }, []);
 
-  onSearchChange = (event) => {
-    this.setState({ searchField: event.target.value });
+  const filteredMonsters = monsters.filter((monster) =>
+    monster.name.toLowerCase().includes(searchField.toLowerCase())
+  );
+  console.log('fired')
+  const onSearchChange = (event) => {
+    const searchFieldString = event.target.value.toLocaleLowerCase();
+    setSearchFeild(searchFieldString);
   };
+  return (
+    <div className="App">
+      <h1>Monsters Rolodex</h1>
+      <input
+        className="search-box"
+        placeholder="search Monster"
+        onChange={onSearchChange}
+      />
+      <SearchBox onChange={onSearchChange}/>
 
-  render() {
-    const { monsters, searchField } = this.state;
-    const filteredMonsters = monsters.filter((monster) =>
-      monster.name.toLowerCase().includes(searchField.toLowerCase())
-    );
-    // console.log(filte  redMonsters)
-    return (
-      <div className="App">
-        <h1>Monsters Rolodex</h1>
-        <SearchBox onChange={this.onSearchChange}/>
- 
-        <CardList monsters={filteredMonsters} />
-      </div>
-    );
-  }
-}
+      <CardList monsters={filteredMonsters} />
+    </div>
+  );
+};
 
 export default App;
